@@ -29,10 +29,10 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "*")
 
 public class UsuarioController{
-    private final UsuarioService service;
+    private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService service){
-        this.service = service;
+    public UsuarioController(UsuarioService usuarioService){
+        this.usuarioService = usuarioService;
     }
 
 
@@ -51,7 +51,7 @@ public class UsuarioController{
 
     //busca a un usuario por id (error 404 si no existe)
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtenerUsuarioById(@PathVariable("Id") Long id){
+    public ResponseEntity<Usuario> obtenerUsuarioById(@PathVariable("id") Long id){
         return ResponseEntity.ok(usuarioService.obtenerUsuarioById(id));
     }
 
