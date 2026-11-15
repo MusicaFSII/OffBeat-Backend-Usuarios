@@ -9,6 +9,8 @@ import com.example.usuarios.dto.CambiarClaveDTO;
 import com.example.usuarios.dto.LoginDTO;
 import com.example.usuarios.dto.RegistroDTO;
 import com.example.usuarios.dto.UsuarioDTO;
+import com.example.usuarios.dto.GoogleLoginDTO;
+import com.example.usuarios.client.GoogleClient;
 import com.example.usuarios.exception.CredencialesInvalidasException;
 import com.example.usuarios.exception.UsuarioNoEncontradoException;
 import com.example.usuarios.mapper.UsuarioMapper;
@@ -21,11 +23,14 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepo;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
+    private final GoogleClient googleClient;
 
-    public UsuarioService(UsuarioRepository usuarioRepo, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder){
+    public UsuarioService(UsuarioRepository usuarioRepo, UsuarioMapper usuarioMapper,
+                          PasswordEncoder passwordEncoder, GoogleClient googleClient){
         this.usuarioRepo = usuarioRepo;
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
+        this.googleClient = googleClient;
     }
 
     //obtiene todos los usuarios
@@ -55,6 +60,14 @@ public class UsuarioService {
         return usuarioRepo.findByCorreo(dto.getCorreo())
             .filter(u -> passwordEncoder.matches(dto.getContrasena(), u.getContrasena()))
             .orElseThrow(CredencialesInvalidasException::new);
+    }
+
+    //login con google: valida el token y deja entrar solo si el correo ya tiene cuenta
+    public Usuario loginConGoogle(GoogleLoginDTO dto){
+        String correo = googleClient.obtenerCorreoVerificado(dto.getCredential());
+        return usuarioRepo.findByCorreo(correo)
+            .orElseThrow(() -> new UsuarioNoEncontradoException(
+                "Esta cuenta de Google no esta registrada. Registrate primero con el mismo correo"));
     }
 
     //valida el correo y las contraseñas, encripta la contraseña y guarda (el primer usuario creado tiene rol de admin)

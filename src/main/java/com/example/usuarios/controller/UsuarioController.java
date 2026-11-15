@@ -21,7 +21,7 @@ import com.example.usuarios.dto.RegistroDTO;
 import com.example.usuarios.dto.UsuarioDTO;
 import com.example.usuarios.model.Usuario;
 import com.example.usuarios.service.UsuarioService;
-
+import com.example.usuarios.dto.GoogleLoginDTO;
 import jakarta.validation.Valid;
 
 @RestController
@@ -67,6 +67,12 @@ public class UsuarioController{
     @PostMapping("/login")
     public ResponseEntity<Usuario> login(@Valid @RequestBody LoginDTO dto){
         return ResponseEntity.ok(usuarioService.login(dto));
+    }
+
+    //iniciar sesión con Google
+    @PostMapping("/login/google")
+    public ResponseEntity<Usuario> loginConGoogle(@Valid @RequestBody GoogleLoginDTO dto){
+        return ResponseEntity.ok(usuarioService.loginConGoogle(dto));
     }
 
     //crea un nuevo usuario

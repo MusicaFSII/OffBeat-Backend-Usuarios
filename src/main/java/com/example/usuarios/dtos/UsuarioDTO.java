@@ -36,6 +36,6 @@ public class UsuarioDTO {
     private String comuna;
 
     @NotBlank(message = "El rol es obligatorio")
-    @Pattern(regexp = "cliente|admin", message = "El rol debe ser cliente o admin")
+    @Pattern(regexp = "cliente|admin|vendedor", message = "El rol debe ser cliente, admin o vendedor")
     private String rol;
 }
