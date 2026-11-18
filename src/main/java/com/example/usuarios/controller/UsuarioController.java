@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.usuarios.dto.CambiarClaveDTO;
 import com.example.usuarios.dto.LoginDTO;
+import com.example.usuarios.dto.LoginRespuestaDTO;
 import com.example.usuarios.dto.RegistroDTO;
 import com.example.usuarios.dto.UsuarioDTO;
 import com.example.usuarios.model.Usuario;
@@ -65,7 +66,7 @@ public class UsuarioController{
     /*##-------------------------------METODOS POST-------------------------------##*/
     //inicia sesion (error 401 si las credenciales estan mal)
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@Valid @RequestBody LoginDTO dto){
+    public ResponseEntity<LoginRespuestaDTO> login(@Valid @RequestBody LoginDTO dto){
         return ResponseEntity.ok(usuarioService.login(dto));
     }
 

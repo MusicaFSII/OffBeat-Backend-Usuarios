@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.usuarios.dto.CambiarClaveDTO;
 import com.example.usuarios.dto.LoginDTO;
+import com.example.usuarios.dto.LoginRespuestaDTO;
 import com.example.usuarios.dto.RegistroDTO;
 import com.example.usuarios.dto.UsuarioDTO;
 import com.example.usuarios.dto.GoogleLoginDTO;
@@ -24,13 +25,15 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
     private final GoogleClient googleClient;
+    private final JwtService jwtService;
 
     public UsuarioService(UsuarioRepository usuarioRepo, UsuarioMapper usuarioMapper,
-                          PasswordEncoder passwordEncoder, GoogleClient googleClient){
+                          PasswordEncoder passwordEncoder, GoogleClient googleClient, JwtService jwtService){
         this.usuarioRepo = usuarioRepo;
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
         this.googleClient = googleClient;
+         this.jwtService = jwtService;
     }
 
     //obtiene todos los usuarios
@@ -56,10 +59,23 @@ public class UsuarioService {
     }
 
     //buscar por el correo y deja pasar solo si la constraseña coincide con el hash
-    public Usuario login(LoginDTO dto){
-        return usuarioRepo.findByCorreo(dto.getCorreo())
-            .filter(u -> passwordEncoder.matches(dto.getContrasena(), u.getContrasena()))
+    public LoginRespuestaDTO login(LoginDTO dto){
+        Usuario usuario = usuarioRepo.findByCorreo(dto.getCorreo())
+            .filter(u -> passwordEncoder.matches(
+                dto.getContrasena(),
+                u.getContrasena()
+            ))
             .orElseThrow(CredencialesInvalidasException::new);
+        
+        String token = jwtService.generarToken(usuario);
+
+        return new LoginRespuestaDTO(
+            token,
+            "Bearer",
+            usuario.getId(),
+            usuario.getCorreo(),
+            usuario.getRol()
+        );
     }
 
     //login con google: valida el token y deja entrar solo si el correo ya tiene cuenta
@@ -70,7 +86,7 @@ public class UsuarioService {
                 "Esta cuenta de Google no esta registrada. Registrate primero con el mismo correo"));
     }
 
-    //valida el correo y las contraseñas, encripta la contraseña y guarda (el primer usuario creado tiene rol de admin)
+     //valida el correo y las contraseñas, encripta la contraseña y guarda (el primer usuario creado tiene rol de admin)
     public Usuario registrar(RegistroDTO dto){
         if(usuarioRepo.existsByCorreo(dto.getCorreo())){
             throw new IllegalArgumentException("El correo ya esta registrado");
