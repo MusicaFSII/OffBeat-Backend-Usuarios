@@ -33,7 +33,7 @@ public class UsuarioService {
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
         this.googleClient = googleClient;
-         this.jwtService = jwtService;
+        this.jwtService = jwtService;
     }
 
     //obtiene todos los usuarios
@@ -74,7 +74,12 @@ public class UsuarioService {
             "Bearer",
             usuario.getId(),
             usuario.getCorreo(),
-            usuario.getRol()
+            usuario.getRol(),
+            usuario.getNombre(),
+            usuario.getApellido(),
+            usuario.getTelefono(),
+            usuario.getRegion(),
+            usuario.getComuna()
         );
     }
 

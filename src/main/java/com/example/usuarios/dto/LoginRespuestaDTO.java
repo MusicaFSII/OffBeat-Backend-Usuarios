@@ -4,14 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data 
-@NoArgsConstructor 
-@AllArgsConstructor 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginRespuestaDTO {
-    
+
     private String token;
     private String tipo;
     private Long id;
     private String correo;
     private String rol;
+    private String nombre;
+    private String apellido;
+    private String telefono;
+    private String region;
+    private String comuna;
 }

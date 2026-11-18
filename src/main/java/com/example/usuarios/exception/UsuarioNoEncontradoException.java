@@ -1,6 +1,4 @@
-package com.example.usuarios.exception;
-
-import org.springframework.http.HttpStatus;
+package com.example.usuarios.exceptionimport org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
