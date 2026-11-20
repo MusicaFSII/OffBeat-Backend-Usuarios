@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }
 
-    //400: fallo alguna validacion del DTO (@NotBlank, @Email, @Pattern...)
+    //400: fallo alguna validacion del DTO
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> validacion(MethodArgumentNotValidException e){
         String mensaje = e.getBindingResult().getFieldErrors().stream()
