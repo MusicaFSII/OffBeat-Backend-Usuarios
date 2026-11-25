@@ -66,7 +66,24 @@ public class UsuarioService {
                 u.getContrasena()
             ))
             .orElseThrow(CredencialesInvalidasException::new);
-        
+
+        return crearRespuestaLogin(usuario);
+    }
+
+    //login con google: valida el token con Google (401 si es invalido)
+    //y deja entrar solo si el correo ya tiene cuenta (404 si no la tiene)
+    public LoginRespuestaDTO loginConGoogle(GoogleLoginDTO dto){
+        String correo = googleClient.obtenerCorreoVerificado(dto.getCredential());
+
+        Usuario usuario = usuarioRepo.findByCorreo(correo)
+            .orElseThrow(() -> new UsuarioNoEncontradoException(
+                "Esta cuenta de Google no esta registrada. Registrate primero con el mismo correo"));
+
+        return crearRespuestaLogin(usuario);
+    }
+
+    //genera el token y arma la respuesta de login (la usan el login normal y el de google)
+    private LoginRespuestaDTO crearRespuestaLogin(Usuario usuario){
         String token = jwtService.generarToken(usuario);
 
         return new LoginRespuestaDTO(
@@ -82,29 +99,6 @@ public class UsuarioService {
             usuario.getComuna()
         );
     }
-
-    //login con google: valida el token y deja entrar solo si el correo ya tiene cuenta
-    public LoginRespuestaDTO loginConGoogle(GoogleLoginDTO dto){
-    String correo = googleClient.obtenerCorreoVerificado(dto.getCredential());
-    Usuario usuario = usuarioRepo.findByCorreo(correo)
-        .orElseThrow(() -> new UsuarioNoEncontradoException(
-            "Esta cuenta de Google no esta registrada. Registrate primero con el mismo correo"));
-
-    String token = jwtService.generarToken(usuario);
-
-    return new LoginRespuestaDTO(
-        token,
-        "Bearer",
-        usuario.getId(),
-        usuario.getCorreo(),
-        usuario.getRol(),
-        usuario.getNombre(),
-        usuario.getApellido(),
-        usuario.getTelefono(),
-        usuario.getRegion(),
-        usuario.getComuna()
-    );
-}
 
      //valida el correo y las contraseñas, encripta la contraseña y guarda (el primer usuario creado tiene rol de admin)
     public Usuario registrar(RegistroDTO dto){
