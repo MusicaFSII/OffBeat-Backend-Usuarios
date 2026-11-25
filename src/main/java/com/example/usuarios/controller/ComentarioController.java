@@ -26,7 +26,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/comentarios")
-@CrossOrigin(origins = "*")
 public class ComentarioController {
 
     private final ComentarioService comentarioService;

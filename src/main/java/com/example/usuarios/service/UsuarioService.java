@@ -5,13 +5,13 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.usuarios.client.GoogleClient;
 import com.example.usuarios.dto.CambiarClaveDTO;
+import com.example.usuarios.dto.GoogleLoginDTO;
 import com.example.usuarios.dto.LoginDTO;
 import com.example.usuarios.dto.LoginRespuestaDTO;
 import com.example.usuarios.dto.RegistroDTO;
 import com.example.usuarios.dto.UsuarioDTO;
-import com.example.usuarios.dto.GoogleLoginDTO;
-import com.example.usuarios.client.GoogleClient;
 import com.example.usuarios.exception.CredencialesInvalidasException;
 import com.example.usuarios.exception.UsuarioNoEncontradoException;
 import com.example.usuarios.mapper.UsuarioMapper;
@@ -84,12 +84,27 @@ public class UsuarioService {
     }
 
     //login con google: valida el token y deja entrar solo si el correo ya tiene cuenta
-    public Usuario loginConGoogle(GoogleLoginDTO dto){
-        String correo = googleClient.obtenerCorreoVerificado(dto.getCredential());
-        return usuarioRepo.findByCorreo(correo)
-            .orElseThrow(() -> new UsuarioNoEncontradoException(
-                "Esta cuenta de Google no esta registrada. Registrate primero con el mismo correo"));
-    }
+    public LoginRespuestaDTO loginConGoogle(GoogleLoginDTO dto){
+    String correo = googleClient.obtenerCorreoVerificado(dto.getCredential());
+    Usuario usuario = usuarioRepo.findByCorreo(correo)
+        .orElseThrow(() -> new UsuarioNoEncontradoException(
+            "Esta cuenta de Google no esta registrada. Registrate primero con el mismo correo"));
+
+    String token = jwtService.generarToken(usuario);
+
+    return new LoginRespuestaDTO(
+        token,
+        "Bearer",
+        usuario.getId(),
+        usuario.getCorreo(),
+        usuario.getRol(),
+        usuario.getNombre(),
+        usuario.getApellido(),
+        usuario.getTelefono(),
+        usuario.getRegion(),
+        usuario.getComuna()
+    );
+}
 
      //valida el correo y las contraseñas, encripta la contraseña y guarda (el primer usuario creado tiene rol de admin)
     public Usuario registrar(RegistroDTO dto){
